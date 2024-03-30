@@ -371,7 +371,8 @@ export function submit (client, text) {
         if ($doc) {
             let theme = $doc.theme.split(',');
             if (!my.opts.injeong && ($doc.flag & KOR_FLAG.INJEONG)) denied();
-            else if (mode != "KKT" && ($doc.flag & KOR_FLAG.KUNG)) denied();
+            else if (mode != "KKT" && theme && theme.includes("KKT")) denied();
+            else if (mode != "KDA" && theme && theme.includes("DAN")) denied();
             else if (my.opts.strict && (!$doc.type.match(KOR_STRICT) || $doc.flag >= 4)) denied(406);
             else if (my.opts.loanword && ($doc.flag & KOR_FLAG.LOANWORD)) denied(405);
             else if (my.opts.safe && theme && theme.includes("SBW")) denied(411);

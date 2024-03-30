@@ -39,8 +39,7 @@ export const KOR_FLAG = {
     SPACED: 4,    // 띄어쓰기를 해야 하는 어휘
     SATURI: 8,    // 방언
     OLD: 16,      // 옛말
-    MUNHWA: 32,   // 문화어
-    KUNG: 64      // 쿵쿵따 전용 단어
+    MUNHWA: 32   // 문화어
 };
 
 export const ROBOT_START_DELAY = [ 1200, 800, 500, 300, 150, 10 ];
