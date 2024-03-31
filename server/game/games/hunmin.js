@@ -165,6 +165,7 @@ export function submit (client, text, data) {
 
                 if ($doc) {
                     if (!my.opts.injeong && ($doc.flag & KOR_FLAG.INJEONG)) denied();
+                    else if (!my.opts.opendict && theme && theme.includes("ODW")) denied();
                     else if (my.opts.strict && (!$doc.type.match(KOR_STRICT) || $doc.flag >= 4)) denied(406);
                     else if (my.opts.loanword && ($doc.flag & KOR_FLAG.LOANWORD)) denied(405);
                     else preApproved();

@@ -26,7 +26,11 @@
     "itm": { "name": "Item" },
     "etq": { "name": "Etiquette" },
     "gnt": { "name": "Gentle" },
-    "apm": { "name": "Apmal" }
+    "apm": { "name": "Apmal" },
+    "odw": {
+      "name": "OpenDict",
+      "req": "ext"
+    }
   },
   "RULE": {
     "EKT": {
@@ -50,7 +54,7 @@
     "KKT": {
       "lang": "ko",
       "rule": "Classic",
-      "opts": ["man", "saf", "gnt", "ext", "mis", "loa", "str", "k32", "beg", "nog", "rms", "tct", "rnk", "pwr", "itm", "etq"],
+      "opts": ["man", "saf", "gnt", "ext", "mis", "loa", "str", "odw", "k32", "beg", "nog", "rms", "tct", "rnk", "pwr", "itm", "etq"],
       "time": 1,
       "ai": true,
       "big": false,
@@ -59,7 +63,7 @@
     "KSH": {
       "lang": "ko",
       "rule": "Classic",
-      "opts": ["man", "saf", "gnt", "ext", "mis", "loa", "str", "beg", "nog", "rms", "tct", "rnk", "itm", "etq"],
+      "opts": ["man", "saf", "gnt", "ext", "mis", "loa", "str", "odw", "beg", "nog", "rms", "tct", "rnk", "itm", "etq"],
       "time": 1,
       "ai": true,
       "big": false,
@@ -104,7 +108,7 @@
     "KAP": {
       "lang": "ko",
       "rule": "Classic",
-      "opts": ["man", "saf", "gnt", "ext", "mis", "loa", "str", "beg", "nog", "rms", "tct", "rnk", "itm"],
+      "opts": ["man", "saf", "gnt", "ext", "mis", "loa", "str", "odw", "beg", "nog", "rms", "tct", "rnk", "itm"],
       "time": 1,
       "ai": true,
       "big": false,
@@ -113,7 +117,7 @@
     "HUN": {
       "lang": "ko",
       "rule": "Hunmin",
-      "opts": ["ext", "mis", "loa", "str", "beg", "nog", "rms", "rnk", "etq"],
+      "opts": ["ext", "mis", "loa", "str", "odw", "beg", "nog", "rms", "rnk", "etq"],
       "time": 1,
       "ai": true,
       "big": false,
