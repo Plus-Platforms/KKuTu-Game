@@ -158,6 +158,8 @@ reloads.event = () => {
                 event.EVENT_ITEMPIECE.EXCHANGE[k].id = "exchange." + (auto++)
             }
             EXCHANGEABLES[event.EVENT_ID] = event.EVENT_ITEMPIECE.EXCHANGE;
+        } else {
+            EXCHANGEABLES[event.EVENT_ID] = [];
         }
     }
     /* 자동변환, 시스템 개편으로 사용하지 않음
