@@ -366,6 +366,7 @@ export class Client {
             delete this.profile.birth;
             delete this.profile._age;
             */
+            delete this.profile.image;
             delete this.profile.sid;
             delete this.profile.token;
 

@@ -190,6 +190,7 @@ export async function refreshWordcache () {
             const flag = data['flag'];
             const theme = data['theme'].split(',');
             const hbw = theme.includes('HBW');
+            const odw = theme.includes('ODW');
             
             newCache[_id] = data;
 
@@ -213,11 +214,13 @@ export async function refreshWordcache () {
              *  1 = 깐깐에서 사용 불가능한 단어
              *  2 = 우리말에서 사용 불가능한 단어
              *  3 = HBW 주제의 단어
-             *  4 = *HBW 주제 외의 어인정 단어
+             *  4 = ODW 주제의 단어
+             *  5 = *HBW 주제 외의 어인정 단어
              */
             let fi = 0;
-            if (!hbw && (flag & 2)) fi = 4;
+            if (odw) fi = 4;
             else if (hbw) fi = 3;
+            else if (flag & 2) fi = 5;
             else if (flag & 1) fi = 2;
             else if (flag > 3) fi = 1;
 

@@ -334,7 +334,10 @@ export function getWordList(char, subc, iij) {
         if (!my.opts.loanword) R.append(MAN[char][baseIndex][2]); // 우리말
         if (my.opts.injeong) {
             R.append(MAN[char][baseIndex][3]); // HBW 어인정
-            if (iij) R.append(MAN[char][baseIndex][4]); // 나머지 어인정
+            if (iij) R.append(MAN[char][baseIndex][5]); // 나머지 어인정
+        }
+        if (my.opts.opendict) {
+            R.append(MAN[char][baseIndex][4]); // ODW 어인정
         }
     } else {
         R.append(MAN[char][baseIndex][0]); // 한국어 외
@@ -362,7 +365,10 @@ function getSpcWordList(char, subc, iij) {
         if (!my.opts.loanword) R.append(MAN[char][baseIndex][2]); // 우리말
         if (my.opts.injeong) {
             R.append(MAN[char][baseIndex][3]); // HBW 어인정
-            if (iij) R.append(MAN[char][baseIndex][4]); // 나머지 어인정
+            if (iij) R.append(MAN[char][baseIndex][5]); // 나머지 어인정
+        }
+        if (my.opts.opendict) {
+            R.append(MAN[char][baseIndex][4]); // ODW 어인정
         }
     } else {
         R.append(MAN[char][0]); // 한국어 외
