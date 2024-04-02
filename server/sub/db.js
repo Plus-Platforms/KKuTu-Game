@@ -226,8 +226,8 @@ export async function refreshWordcache () {
             else if (flag > 3) fi = 1;
 
             if (!kkt) { // 쿵쿵따 전용 단어 스킵
-                if (!newManner.hasOwnProperty(start)) newManner[start] = [getMannerTemplate(5), getMannerTemplate(5)];
-                if (!newManner.hasOwnProperty(last)) newManner[last] = [getMannerTemplate(5), getMannerTemplate(5)];
+                if (!newManner.hasOwnProperty(start)) newManner[start] = [getMannerTemplate(6), getMannerTemplate(6)];
+                if (!newManner.hasOwnProperty(last)) newManner[last] = [getMannerTemplate(6), getMannerTemplate(6)];
 
                 newManner[start][1][fi].push(data);
                 newManner[last][0][fi].push(data);
