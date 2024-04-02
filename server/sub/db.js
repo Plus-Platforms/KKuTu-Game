@@ -191,6 +191,7 @@ export async function refreshWordcache () {
             const theme = data['theme'].split(',');
             const hbw = theme.includes('HBW');
             const odw = theme.includes('ODW');
+            const kkt = theme.includes('KKT');
             
             newCache[_id] = data;
 
@@ -224,8 +225,7 @@ export async function refreshWordcache () {
             else if (flag & 1) fi = 2;
             else if (flag > 3) fi = 1;
 
-            if (!(flag & 64)) { // 쿵쿵따 전용 단어 스킵
-
+            if (!kkt) { // 쿵쿵따 전용 단어 스킵
                 if (!newManner.hasOwnProperty(start)) newManner[start] = [getMannerTemplate(5), getMannerTemplate(5)];
                 if (!newManner.hasOwnProperty(last)) newManner[last] = [getMannerTemplate(5), getMannerTemplate(5)];
 
