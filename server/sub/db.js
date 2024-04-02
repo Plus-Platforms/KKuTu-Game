@@ -238,7 +238,7 @@ export async function refreshWordcache () {
             let i = 0;
             if (_id.length == 2) i = 1; // 3232용 2글자 기록
 
-            if (!newSpcManner.hasOwnProperty(last)) newSpcManner[last] = [getMannerTemplate(5), getMannerTemplate(5)];
+            if (!newSpcManner.hasOwnProperty(last)) newSpcManner[last] = [getMannerTemplate(6), getMannerTemplate(6)];
             newSpcManner[last][i][fi].push(data);
 
         }
