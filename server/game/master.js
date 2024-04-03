@@ -458,7 +458,6 @@ function auditAdminCommandExecution(id, cmd, value) {
         .setTimestamp();
 
     auditDiscordWebHook.send(embed).then(() => {
-        $c.send('notice', {value: "명령어 사용이 기록되었습니다."});
         IOLog.notice(`관리자 ${id} 님이 관리자 명령어 #${cmd} ${value}을(를) 사용했습니다.`);
     }).catch(err => {
         IOLog.error(`명령어 사용 내역을 디스코드 웹후크로 전송하는 중 오류가 발생했습니다. ${err.message}`);
