@@ -37,6 +37,7 @@ import geoIp from 'geoip-country';
 import { Webhook, MessageBuilder } from 'discord-webhook-node';
 import getLevel from "../sub/KKuTuLevel.js";
 const reportDiscordWebHook = new Webhook(DISCORD_WEBHOOK.REPORT);
+const auditDiscordWebHook = new Webhook(DISCORD_WEBHOOK.AUDIT);
 
 let MainDB;
 
@@ -93,14 +94,16 @@ function processAdmin(id, value) {
         else if (p2.charAt() == "#") cmd = p2.slice(1);
         return p2;
     });
+
     switch (cmd) {
         case "delroom":
             if (temp = ROOM[value]) {
                 for (let i in ROOM[value].players) {
                     let $c = DIC[ROOM[value].players[i]];
                     if ($c) {
-                        $c.send('notice', {value: "관리자에 의하여 접속 중이시던 방이 해체되었습니다."});
+                        $c.send('notice', {value: "관리자에 의하여 접속 중이시던 방이 해체되었습니다. 게임을 새로고침하여 다시 접속해 주세요."});
                         $c.send('roomStuck');
+                        auditAdminCommandExecution(id, cmd, value);
                     }
                 }
                 delete ROOM[value];
@@ -112,6 +115,7 @@ function processAdmin(id, value) {
                 temp.title = msg[1] ? value.slice(msg[0].length + 1) : "바른방제목" + msg[0];
                 temp.worker.send({type: 'room-title', id: msg[0], value: temp.title});
                 KKuTu.publish('room', {target: id, room: temp.getData(), modify: true}, temp.password);
+                auditAdminCommandExecution(id, cmd, value);
             }
             return null;
         case "nick":
@@ -122,22 +126,27 @@ function processAdmin(id, value) {
                 temp.socket.send('{"type":"error","code":410}');
                 temp.socket.close();
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "yell":
             KKuTu.publish('yell', {value: value});
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "notice":
             KKuTu.publish('notice', { value: value });
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "alert":
             j = value.includes("enable-overlay");
             msg = value.replace("enable-overlay", "").trim();
             KKuTu.publish('alert', { value: msg, isOverlayEnabled: j });
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "kill":
             if (temp = DIC[value]) {
                 temp.socket.send('{"type":"error","code":410}');
                 temp.socket.close();
+                auditAdminCommandExecution(id, cmd, value);
             }
             return null;
         case "ip":
@@ -148,6 +157,7 @@ function processAdmin(id, value) {
                     id: id,
                     msg: temp.socket._socket.remoteAddress.slice(7)
                 });
+                auditAdminCommandExecution(id, cmd, value);
             }
             return null;
         case "tailroom":
@@ -162,6 +172,7 @@ function processAdmin(id, value) {
                     id: id,
                     msg: {pw: temp.password, ltc: temp.lastTitle, players: temp.players}
                 });
+                auditAdminCommandExecution(id, cmd, value);
             }
             return null;
         case "tailuser":
@@ -172,6 +183,7 @@ function processAdmin(id, value) {
                 } else T_USER[value] = id;
                 temp.send('test');
                 if (DIC[id]) DIC[id].send('tail', {a: i ? "tuX" : "tu", rid: temp.id, id: id, msg: temp.getData()});
+                auditAdminCommandExecution(id, cmd, value);
             }
             return null;
         case "roominfo":
@@ -182,6 +194,7 @@ function processAdmin(id, value) {
                     id: id,
                     msg: {pw: temp.password, ltc: temp.lastTitle, players: temp.players}
                 });
+                auditAdminCommandExecution(id, cmd, value);
             }
             return null;
         case "dump":
@@ -194,6 +207,8 @@ function processAdmin(id, value) {
                 if(DIC[id]) DIC[id].send('yell', { value: "DUMP OK" });
                 IOLog.notice("Dumping success.");
             });*/
+
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "lobbychat":
             if (allowLobbyChat) {
@@ -207,20 +222,23 @@ function processAdmin(id, value) {
                 DIC[id].send('chat', {notice: true, message: '로비 채팅을 활성화했습니다.'});
                 IOLog.notice(`${id} 님이 로비 채팅을 활성화했습니다.`);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "setxp":
             if(!value) return;
             temp = parseFloat(value);
             if(!XPMultiplier) return;
             XPMultiplier = temp;
-            DIC[id].send('notice', {value: `경험치 배율은 이제 ${XPMultiplier}배입니다.`})
+            DIC[id].send('notice', {value: `경험치 배율은 이제 ${XPMultiplier}배입니다.`});
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "setmoney":
             if(!value) return;
             temp = parseFloat(value);
             if(!MoneyMultiplier) return;
             MoneyMultiplier = temp;
-            DIC[id].send('notice', {value: `핑 배율은 이제 ${MoneyMultiplier}배입니다.`})
+            DIC[id].send('notice', {value: `핑 배율은 이제 ${MoneyMultiplier}배입니다.`});
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "flushguest":
             try {
@@ -234,6 +252,7 @@ function processAdmin(id, value) {
             } catch (e) {
                 IOLog.error(e);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "flushuser":
             try {
@@ -247,6 +266,7 @@ function processAdmin(id, value) {
             } catch (e) {
                 IOLog.error(e);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "allowroomcreate":
             if(allowRoomCreate) {
@@ -258,6 +278,7 @@ function processAdmin(id, value) {
                 DIC[id].send('chat', {notice: true, message: '방 생성이 활성화되었습니다.'});
                 IOLog.notice(`${id} 님이 방 생성을 활성화했습니다.`);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "allowguest":
             if(allowGuestEnter) {
@@ -283,6 +304,7 @@ function processAdmin(id, value) {
                 DIC[id].send('chat', {notice: true, message: '손님 계정의 출입을 활성화했습니다.'});
                 IOLog.notice(`${id} 님이 손님 계정의 출입을 활성화했습니다.`);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "allowenter":
             if(allowEnter) {
@@ -296,6 +318,7 @@ function processAdmin(id, value) {
                 DIC[id].send('chat', {notice: true, message: '채널의 계정의 출입을 활성화했습니다.'});
                 IOLog.notice(`${id} 님이 채널의 출입을 활성화했습니다.`);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case 'captcha':
             if(alwaysTriggerCaptcha) {
@@ -309,24 +332,27 @@ function processAdmin(id, value) {
                 DIC[id].send('chat', {notice: true, message: 'CAPTCHA 인증 대상을 "모든 계정"(으)로 설정하였습니다.'});
                 IOLog.notice(`${id} 님이 CAPTCHA 인증 대상을 "모든 계정"(으)로 설정하였습니다.`);
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "refreshword":
             DIC[id].send('notice', {value: "단어 캐시를 다시 불러옵니다. 자세한 내용은 로그를 참조하세요."});
             IOLog.notice(`${id} 님이 단어 캐시를 갱신했습니다.`);
             publishMessage({type:"refresh-word"});
             MainDB.refreshWordcache();
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "refreshshop":
             DIC[id].send('notice', {value: "아이템 정보를 다시 불러옵니다. 자세한 내용은 로그를 참조하세요."});
             IOLog.notice(`${id} 님이 아이템 정보를 갱신했습니다.`);
             publishMessage({type:"refresh-shop"});
             MainDB.refreshShopcache();
+            auditAdminCommandExecution(id, cmd, value);
             return null;
         case "reload":
             temp = value.trim().split(" ");
             if (value.trim() == "#reload" || temp.length === 0) {
-                DIC[id].send('notice', {value: `리로드 가능한 설정 파일 목록 : ${Object.keys(reloads).join(", ")}`});
-                DIC[id].send('notice', {value: "all을 입력하면 모든 값을 다시 불러옵니다."});
+                DIC[id].send('notice', {value: `리로드 가능한 설정 파일 목록: ${Object.keys(reloads).join(", ")}`});
+                // DIC[id].send('notice', {value: "all을 입력하면 모든 값을 다시 불러옵니다."});
                 return null;
             }
             if (temp.indexOf("all") != -1) {
@@ -374,8 +400,8 @@ function processAdmin(id, value) {
                 DIC[temp[0]].flush(true);
                 if (DIC[temp[0]].place) KKuTu.publish('refresh', { id: temp[0] });
             }
+            auditAdminCommandExecution(id, cmd, value);
             return null;
-
     }
     return value;
 }
@@ -419,6 +445,23 @@ function narrateFriends(id, friends, stat) {
             WDIC[i].send('narrate-friend', {id: id, s: SID, stat: stat, list: sf});
             break;
         }
+    });
+}
+
+function auditAdminCommandExecution(id, cmd, value) {
+    const embed = new MessageBuilder()
+        .setTitle('관리자 명령어 사용 기록')
+        .setDescription(`관리자 ${id}님이 게임 내에서 관리자 명령어를 사용하였습니다.`)
+        .setColor(14423100)
+        .addField('관리자 ID', id, false)
+        .addField('사용 명령어', `\`#${cmd} ${value}\``, false)
+        .setTimestamp();
+
+    auditDiscordWebHook.send(embed).then(() => {
+        $c.send('notice', {value: "명령어 사용이 기록되었습니다."});
+        IOLog.notice(`관리자 ${id} 님이 관리자 명령어 #${cmd} ${value}을(를) 사용했습니다.`);
+    }).catch(err => {
+        IOLog.error(`명령어 사용 내역을 디스코드 웹후크로 전송하는 중 오류가 발생했습니다. ${err.message}`);
     });
 }
 
@@ -966,7 +1009,7 @@ function processClientRequest($c, msg) {
                 $c.send('notice', {value: "신고가 정상적으로 접수되었습니다."});
                 IOLog.notice(`${$c.profile.title}(${$c.id}) 님이 ${msg.id} 님을 "${msg.reason}" 사유로 신고했습니다.`);
             }).catch(err => {
-                IOLog.error(`신고 내용을 디스코드 웹훅으로 전송하는 중 오류가 발생했습니다. ${err.message}`);
+                IOLog.error(`신고 내용을 디스코드 웹후크로 전송하는 중 오류가 발생했습니다. ${err.message}`);
             });
 
             break;
