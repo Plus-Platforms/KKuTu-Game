@@ -919,6 +919,9 @@ function processClientRequest($c, msg) {
 
             $c.publish('notice', {value: msg.value});
             break;
+        case 'ping':
+            $c.send('pong');
+            break;
         case 'refresh':
             if ($c.gaming) return;
             $c.refresh();
