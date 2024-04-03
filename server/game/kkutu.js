@@ -2499,8 +2499,10 @@ function getRewards(mode, score, bonus, rank, all, ss, membership) {
             break;
     }
 
+    let pos = (all - rank) > 8 ? 8 + ((all - rank - 8) * 0.4) : (all - rank);
+
     rw.score = rw.score
-        * (0.77 + 0.05 * (all - rank) * (all - rank)) // 순위
+        * (0.77 + 0.05 * pos * pos) // 순위
         * 1.25 / (1 + 1.25 * sr * sr) // 점차비(양학했을 수록 ↓)
     ;
     rw.money = 1 + rw.score * 0.01;
