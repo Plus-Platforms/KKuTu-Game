@@ -231,6 +231,31 @@ export function turnEnd () {
         }
         target.game.score += score;
     }
+    if(my.game.attackInfo != null){
+        const getBonusCoeff = dist => (40 - 5 * my.game.attackInfo.remainingWordCount) * 0.5 ** dist;
+
+        const prevTurn = my.game.turn - 1;
+        let turnIndex = prevTurn < 0 ? my.game.seq.length + prevTurn : prevTurn;
+        while(turnIndex != my.game.turn){
+
+            const sub = my.game.turn - turnIndex;
+            const turnDist = sub < 0 ? my.game.seq.length + sub : sub;
+            const id = my.game.seq[turnIndex];
+            const bonus = Math.round(getBonusCoeff(turnDist - 1) * -score / 100);
+
+            if(bonus > 0){
+                const isBot = !DIC[id];
+                (isBot ? id : DIC[id]).game.score += bonus;
+                my.byMaster('attackBonus', {
+                    id: isBot ? id.id : id,
+                    value: bonus
+                }, true);
+            }
+            turnIndex--;
+            if(turnIndex < 0) turnIndex = my.game.seq.length - 1;
+        }
+        my.game.attackInfo = null;
+    }
     /**
      * TODO: 공격 성공 시 점수 보너스
      * 바로 전 사람은 공격 성공 시
@@ -325,8 +350,21 @@ export function submit (client, text) {
                 if (match == preChar || match == preSubChar) return; // 돌림글자 계산 안함
                 let currManner = my.game.manner;
                 if (my.game.wordLength && my.game.wordLength == 2) currManner = my.game.manner_alt;
-                if (!currManner.hasOwnProperty(match)) getManner.call(my, match);
-                currManner[match]--;
+
+                const last = text.slice(-1);
+                // submit할 때 앞 글자를 기록하게 되면 getManner를 추가 호출해서 기록하지 않는 한
+                // 판정 문제 발생해서 뒷 글자 기록하는 걸로 변경
+                // if (!currManner.hasOwnProperty(match)) getManner.call(my, match);
+                if(!currManner.hasOwnProperty(last)) getManner.call(my, last);
+                currManner[last]--;
+
+                // 스택 킬 보너스: 한방이 아닐 때만 따로 공격 판정
+                // 남은 단어가 8개 이상이면 획득 보너스가 0%가 되므로 판정하지 않음
+                if(getWordList.call(my, my.game.char, my.game.subChar) && currManner[last] < 8){
+                    my.game.attackInfo = {
+                        remainingWordCount: currManner[last]
+                    }
+                }
 
             }
 
