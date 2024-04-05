@@ -43,10 +43,10 @@ export const KOR_FLAG = {
 };
 
 export const ROBOT_START_DELAY = [ 1200, 800, 500, 300, 150, 10 ];
-export const ROBOT_TYPE_COEF = [ 1150, 750, 500, 300, 150, 5 ]; // 자음퀴즈는 두배로 사용
+export const ROBOT_TYPE_COEF = [ 1000, 600, 300, 200, 100, 5 ]; // 자음퀴즈는 두배로 사용
 export const ROBOT_THINK_COEF = [ 4, 3, 2, 1, 0, 0 ];
 export const ROBOT_HIT_LIMIT = [ 8, 6, 4, 2, 1, 0 ]; // 단어대결은 절반으로 사용
-export const ROBOT_LENGTH_LIMIT = [ 3, 7, 11, 33, 66, 99 ];
+export const ROBOT_LENGTH_LIMIT = [ 3, 6, 9, 27, 54, 99 ];
 
 // 십자말풀이, 해당 부분이 더미데이터라 제외함
 // export const ROBOT_SEEK_DELAY = [ 5000, 3500, 2000, 1200, 600, 100 ];
