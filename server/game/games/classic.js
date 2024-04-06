@@ -146,6 +146,8 @@ export function roundReady () {
         my.game.chain = [];
         my.game.manner = {};
         my.game.manner_alt = {};
+        if (isFirstRound) my.game.roundEat = 0;
+        my.game.attackInfo = {};
         if (my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.tactical);
         if (my.opts.sami) my.game.wordLength = 2;
         if (my.opts.item) {
@@ -154,7 +156,6 @@ export function roundReady () {
                 my.game.used = {};
                 my.game.rev = false;
                 my.game.ilock = false;
-                my.game.roundEat = 0;
             }
             for (o of my.game.seq) {
                 let t = o.robot ? o.id : o;
@@ -225,6 +226,7 @@ export function turnEnd () {
     my.game.late = true;
 
     let WL = getWordList.call(my, my.game.char, my.game.subChar);
+
     if (target) if (target.game) {
         if (!getManner.call(my, my.game.char, my.game.subChar) && (my.opts.safe || my.opts.gentle)) {
             score = 0; // 특수규칙 "안전" - 기능 변경됐지만 일부 허점이 있을 수 있음을 감안하여 코드 유지
@@ -234,7 +236,7 @@ export function turnEnd () {
         }
         target.game.score += score;
     }
-    if(my.game.attackInfo != null){
+    if(my.game.attackInfo && my.game.attackInfo.remainingWordCount){
         if (my.game.attackInfo.remainingWordCount <= 10) stack = true;
         const getBonusCoeff = dist => (40 - 5 * my.game.attackInfo.remainingWordCount) * 0.5 ** dist;
 
@@ -258,18 +260,18 @@ export function turnEnd () {
             turnIndex--;
             if(turnIndex < 0) turnIndex = my.game.seq.length - 1;
         }
-        my.game.attackInfo = null;
+        my.game.attackInfo = {};
     }
     /**
      * TODO: 공격 성공 시 점수 보너스
      * 바로 전 사람은 공격 성공 시
 
-    else {
-        let mannerBonus = (10 - getManner.call(my, my.game.char, my.game.subChar));
-        if(mannerBonus < 0) mannerBonus = 0;
+     else {
+     let mannerBonus = (10 - getManner.call(my, my.game.char, my.game.subChar));
+     if(mannerBonus < 0) mannerBonus = 0;
 
-        score = mannerBonus * 10;
-    }
+     score = mannerBonus * 10;
+     }
      **/
 
     my.byMaster('turnEnd', {
@@ -344,16 +346,19 @@ export function submit (client, text) {
                     switch(my.game.roundEat) {
                         case 1:
                             roundEatPenaltyMultiplier = 0.5;
+                            break;
                         case 2:
                             roundEatPenaltyMultiplier = 0.75;
+                            break;
                         case 3:
                             roundEatPenaltyMultiplier = 0.925;
+                            break;
                         case 10:
                             roundEatPenaltyMultiplier = 1.125;
+                            break;
                         default:
                             roundEatPenaltyMultiplier = 1;
                     }
-
                     score = Math.floor(score * roundEatPenaltyMultiplier) || 0;
                     my.game.roundEat = 0;
                 }
@@ -384,9 +389,12 @@ export function submit (client, text) {
                         client.invokeEventPiece(text, 1);
                     DB.kkutu[l].update(['_id', text]).set(['hit', $doc.hit + 1]).on();
                 }
+                let isUnconsidered = false;
                 let theme = $doc.theme.split(',');
-                if (($doc.flag & 2) && theme && !theme.includes('hbw')) return; // 어인정 단어 계산 안함
-                if (match == preChar || match == preSubChar) return; // 돌림글자 계산 안함
+
+                if (($doc.flag & 2) && theme && !theme.includes('hbw')) isUnconsidered = true; // 어인정 단어 계산 안함
+                if (match == preChar || match == preSubChar) isUnconsidered = true; // 돌림글자 계산 안함
+
                 let currManner = my.game.manner;
                 if (my.game.wordLength && my.game.wordLength == 2) currManner = my.game.manner_alt;
 
@@ -395,14 +403,16 @@ export function submit (client, text) {
                 // 판정 문제 발생해서 뒷 글자 기록하는 걸로 변경
                 // if (!currManner.hasOwnProperty(match)) getManner.call(my, match);
                 if(!currManner.hasOwnProperty(last)) getManner.call(my, last);
-                currManner[last]--;
-
+                if(!isUnconsidered) currManner[last]--;
+                
                 // 스택 킬 보너스: 한방이 아닐 때만 따로 공격 판정
                 // 남은 단어가 8개 이상이면 획득 보너스가 0%가 되므로 판정하지 않음
                 if(getWordList.call(my, my.game.char, my.game.subChar) && currManner[last] < 8){
                     my.game.attackInfo = {
                         remainingWordCount: currManner[last]
                     }
+                } else {
+                    my.game.attackInfo = {};
                 }
 
             }
