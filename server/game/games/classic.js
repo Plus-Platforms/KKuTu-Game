@@ -154,6 +154,7 @@ export function roundReady () {
                 my.game.used = {};
                 my.game.rev = false;
                 my.game.ilock = false;
+                my.game.roundEat = 0;
             }
             for (o of my.game.seq) {
                 let t = o.robot ? o.id : o;
@@ -212,6 +213,7 @@ export function turnEnd () {
     let my = this;
     let target;
     let score;
+    let stack = false; // 스택 판정 여부
 
     if (!my.game.seq) return;
     target = DIC[my.game.seq[my.game.turn]] || my.game.seq[my.game.turn];
@@ -226,12 +228,14 @@ export function turnEnd () {
     if (target) if (target.game) {
         if (!getManner.call(my, my.game.char, my.game.subChar) && (my.opts.safe || my.opts.gentle)) {
             score = 0; // 특수규칙 "안전" - 기능 변경됐지만 일부 허점이 있을 수 있음을 감안하여 코드 유지
+            stack = true;
         } else {
             score = getPenalty(my.game.chain, target.game.score);
         }
         target.game.score += score;
     }
     if(my.game.attackInfo != null){
+        if (my.game.attackInfo.remainingWordCount <= 10) stack = true;
         const getBonusCoeff = dist => (40 - 5 * my.game.attackInfo.remainingWordCount) * 0.5 ** dist;
 
         const prevTurn = my.game.turn - 1;
@@ -274,6 +278,20 @@ export function turnEnd () {
         score: score,
         hint: getRandom(WL)
     }, true);
+
+    /**
+     * my.game.roundEat
+     *
+     * 0: 라운드 먹방 아님
+     * 1: 점수 패널티 -50점 이하, 다음 입력 점수 50% 감소
+     * 2: 점수 패널티 -100점 이하, 다음 입력 점수 25% 감소
+     * 3: 점수 패널티 -150점 이하, 다음 입력 점수 12.5% 감소
+     * 10: 스택(사용 가능 단어 10개 이하)으로 인한 게임 종료, 다음 입력 점수 12.5% 보너스
+     */
+    if (stack) my.game.roundEat = 10;
+    else if (score >= -50) my.game.roundEat = 1;
+    else if (score >= -100) my.game.roundEat = 2;
+    else if (score >= -150) my.game.roundEat = 3;
 
     my.game._rrt = setTimeout(runAs, 3000, my, my.roundReady);
     clearTimeout(my.game.robotTimer);
@@ -319,6 +337,27 @@ export function submit (client, text) {
                 clearTimeout(my.game.turnTimer);
                 t = tv - my.game.turnAt;
                 score = my.getScore(text, t);
+
+                if (my.game.roundEat != 0) {
+                    let roundEatPenaltyMultiplier;
+
+                    switch(my.game.roundEat) {
+                        case 1:
+                            roundEatPenaltyMultiplier = 0.5;
+                        case 2:
+                            roundEatPenaltyMultiplier = 0.75;
+                        case 3:
+                            roundEatPenaltyMultiplier = 0.925;
+                        case 10:
+                            roundEatPenaltyMultiplier = 1.125;
+                        default:
+                            roundEatPenaltyMultiplier = 1;
+                    }
+
+                    score = Math.floor(score * roundEatPenaltyMultiplier) || 0;
+                    my.game.roundEat = 0;
+                }
+
                 my.game.dic[text] = (my.game.dic[text] || 0) + 1;
                 my.game.chain.push(text);
                 my.game.roundTime -= t;
