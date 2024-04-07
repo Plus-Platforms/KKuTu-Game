@@ -112,7 +112,7 @@ function processAdmin(id, value) {
         case "roomtitle":
             msg = value.trim().split(" ");
             if (temp = ROOM[msg[0]]) {
-                temp.title = msg[1] ? value.slice(msg[0].length + 1) : "바른방제목" + msg[0];
+                temp.title = msg[1] ? value.slice(msg[0].length + 1) : "바른방제목#" + msg[0];
                 temp.worker.send({type: 'room-title', id: msg[0], value: temp.title});
                 KKuTu.publish('room', {target: id, room: temp.getData(), modify: true}, temp.password);
                 auditAdminCommandExecution(id, cmd, value);
@@ -120,7 +120,7 @@ function processAdmin(id, value) {
             return null;
         case "nick":
             msg = value.trim().split(" ");
-            let newName = msg[1] ? value.slice(msg[0].length + 1) : '바른닉네임#' + msg[0].replace(/[^0-9]/g, "").substring(0, 5);
+            let newName = msg[1] ? value.slice(msg[0].length + 1) : '바른별명#' + msg[0].replace(/[^0-9]/g, "").substring(0, 5);
             MainDB.users.update(['_id', msg[0]]).set(['nickname', newName]).on();
             if (temp = DIC[msg[0]]) {
                 temp.socket.send('{"type":"error","code":410}');
