@@ -94,7 +94,7 @@ export function processUserNickChange ($c, userNick, fixedNick, callback) {
                 }
             }
 
-            if(fixedNick && $body.money < 250) {
+            if(fixedNick && !$c.membership && $body.money < 250) {
                 callback(407);
                 return;
             }
