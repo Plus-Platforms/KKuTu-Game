@@ -960,7 +960,7 @@ function processClientRequest($c, msg) {
             if (!msg.target) return;
             if ($c.guest) return;
             if ($c.id == msg.target) return;
-            if (Object.keys($c.friends).length >= 150) return $c.sendError(452);
+            if (Object.keys($c.friends).length >= 200) return $c.sendError(452);
             if (temp = DIC[msg.target]) {
                 if (temp.guest) return $c.sendError(453);
                 if ($c._friend) return $c.sendError(454);
@@ -973,7 +973,7 @@ function processClientRequest($c, msg) {
         case 'friendAddRes':
             if (!(temp = DIC[msg.from])) return;
             if (temp._friend != $c.id) return;
-            if (Object.keys($c.friends).length >= 150) return $c.sendError(452);
+            if (Object.keys($c.friends).length >= 200) return $c.sendError(452);
             if (msg.res) {
                 // $c와 temp가 친구가 되었다.
                 $c.addFriend(temp.id);
