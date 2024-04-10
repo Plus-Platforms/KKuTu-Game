@@ -930,7 +930,7 @@ function processClientRequest($c, msg) {
         case 'talk':
             if (!msg.value) return;
             if (!msg.value.substr) return;
-            if (!GUEST_PERMISSION.talk) if ($c.guest) {
+            if (!GUEST_PERMISSION.talk && $c.guest && $c.place == 0) {
                 $c.send('error', {code: 401});
                 return;
             }
