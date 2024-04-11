@@ -599,7 +599,7 @@ export class Client {
             return;
         }
 
-        if (this.guest) return this.send('chat', {notice: true, code: 401});
+        if (this.guest && this.place == 0) return this.send('chat', {notice: true, code: 401});
         this.publish('chat', {value: msg, notice: !!code, code: code});
 
         function getInquireId(caseId) {
@@ -1332,7 +1332,11 @@ export class Client {
                 return this.sendError(409);
             }
             if (Cluster.isMaster) {
-                this.send('preRoom', {id: $room.id, pw: room.password, channel: $room.channel});
+                this.send('preRoom', {
+                    id: $room.id,
+                    pw: room.password,
+                    channel: $room.channel
+                });
                 CHAN[$room.channel].send({type: "room-reserve", session: this.sid, room: room, spec: spec, pass: pass});
 
                 $room = undefined;
