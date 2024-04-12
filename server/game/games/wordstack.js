@@ -4,6 +4,7 @@
  * 
  * Based on KKuTu Online
  * Copyright (C) 2017 JJoriping(op@jjo.kr)
+ * Copyright (C) 2017 KKuTuIO(admin@kkutu.io)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
