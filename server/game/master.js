@@ -110,7 +110,7 @@ function processAdmin(id, value) {
                 for (let i in ROOM[value].players) {
                     let $c = DIC[ROOM[value].players[i]];
                     if ($c) {
-                        $c.sendError(472);
+                        $c.sendError(473);
                         $c.place = 0;
                         $c.send('roomStuck');
                         auditAdminCommandExecution(id, cmd, value);
