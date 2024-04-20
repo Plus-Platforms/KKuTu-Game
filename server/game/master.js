@@ -1113,7 +1113,7 @@ function processClientRequest($c, msg) {
             break;
         case 'nickChange':
             if ($c.guest) return;
-            if (!msg.value || !msg.isFixed) return $c.sendError(400);
+            if (!msg.value || typeof msg.isFixed === "undefined") return $c.sendError(400);
             processUserNickChange($c, msg.value, msg.isFixed, function (code) {
                 $c.sendError(code);
             });
