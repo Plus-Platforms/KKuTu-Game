@@ -195,6 +195,7 @@ export let EQUIP_GROUP;
 export let EQUIP_SLOTS;
 export let UID_ALPHABET;
 export let UID_LETTER;
+export let UID_IMPORT_LETTER;
 
 reloads.generic = () => {
     ({
@@ -204,7 +205,8 @@ reloads.generic = () => {
         MAX_OBSERVER,
         EQUIP_GROUP,
         UID_ALPHABET,
-        UID_LETTER
+        UID_LETTER,
+        UID_IMPORT_LETTER
     } = getJson('generic.json'));
     TESTER = ADMIN.concat(TESTER);
     EQUIP_SLOTS = Object.keys(EQUIP_GROUP);

@@ -22,5 +22,6 @@
     "NIK": ["NIK"]
   },
   "UID_ALPHABET": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-",
-  "UID_LETTER": 24
+  "UID_LETTER": 24,
+  "UID_IMPORT_LETTER": 8
 }

@@ -23,11 +23,14 @@ let HTTPS_Server;
 // import { writeSnapshot }from "heapdump";
 import * as KKuTu from './kkutu.js';
 import { decrypt } from "../sub/crypto.js";
-import { UID_ALPHABET, UID_LETTER, reloads, DISCORD_WEBHOOK, GAME_TYPE, IS_WS_SECURED, WEB_KEY, CRYPTO_KEY,
+import { UID_ALPHABET, UID_LETTER, UID_IMPORT_LETTER, reloads, DISCORD_WEBHOOK, GAME_TYPE, IS_WS_SECURED, WEB_KEY, CRYPTO_KEY,
     ADMIN, CAPTCHA_TO_GUEST, CAPTCHA_SITE_KEY,
     TEST_PORT, KKUTU_MAX, TESTER, CAPTCHA_TO_USER, EVENTS, EXCHANGEABLES } from "../config.js";
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet(UID_ALPHABET, UID_LETTER);
+const importId = customAlphabet(UID_ALPHABET, UID_IMPORT_LETTER);
+
+import { CronJob } from 'cron';
 import * as IOLog from '../sub/KKuTuIOLog.js';
 import Secure from '../sub/secure.js';
 import { verifyCaptcha } from '../sub/captcha.js';
@@ -41,6 +44,11 @@ const reportDiscordWebHook = new Webhook(DISCORD_WEBHOOK.REPORT);
 const auditDiscordWebHook = new Webhook(DISCORD_WEBHOOK.AUDIT);
 
 let MainDB;
+
+let savedProgress = {
+    "reqCountByIp": {},
+    "savedUserInfo": {}
+};
 
 let Server;
 let DIC = {};
@@ -102,7 +110,8 @@ function processAdmin(id, value) {
                 for (let i in ROOM[value].players) {
                     let $c = DIC[ROOM[value].players[i]];
                     if ($c) {
-                        $c.send('notice', {value: "관리자에 의하여 접속 중이시던 방이 해체되었습니다. 게임을 새로고침하여 다시 접속해 주세요."});
+                        $c.sendError(472);
+                        $c.place = 0;
                         $c.send('roomStuck');
                         auditAdminCommandExecution(id, cmd, value);
                     }
@@ -1105,6 +1114,7 @@ function processClientRequest($c, msg) {
             break;
         case 'nickChange':
             if ($c.guest) return;
+            if (!msg.value || !msg.isFixed) return $c.sendError(400);
             processUserNickChange($c, msg.value, msg.isFixed, function (code) {
                 $c.sendError(code);
             });
@@ -1112,6 +1122,7 @@ function processClientRequest($c, msg) {
         case 'consume':
             if ($c.gaming) return $c.sendError(438);
             if ($c.guest) return $c.sendError(421);
+            if (!msg.item) return $c.sendError(400);
             let item;
             if (!$c.box.hasOwnProperty(msg.item)) return $c.sendError(430);
             if (!(item = MainDB.shop[msg.item])) return $c.sendError(430);
@@ -1124,6 +1135,7 @@ function processClientRequest($c, msg) {
             });
             break;
         case 'exchange':
+            if (!msg.eid || !msg.id) return $c.sendError(400);
             $c.exchange(msg.eid, msg.id);
             break;
         case 'gift':
@@ -1139,6 +1151,7 @@ function processClientRequest($c, msg) {
             if (!stable) return $c.sendError(556); // 이벤트 진행중 아님
             if ($c.gaming) return $c.sendError(438); // 본인이 게임중
             if ($c.guest) return $c.sendError(421); // 본인이 게스트
+            if (!msg.target) return $c.sendError(400); // 대상이 없음
             if (!DIC.hasOwnProperty(msg.target)) return $c.sendError(405); // 대상이 접속중이 아님
             if (DIC[msg.target].gaming) return $c.sendError(417); // 대상이 게임중
             if (DIC[msg.target].guest) return $c.sendError(421); // 대상이 게스트
@@ -1170,7 +1183,11 @@ function processClientRequest($c, msg) {
             break;
         case 'uid':
             if ($c.guest) return $c.sendError(464);
-            $c.send('uid', { value: $c.getFlag("uid") });
+            $c.send('prompt', {
+                lang: 'newUidInfo',
+                type: 'uid',
+                value: $c.getFlag("uid")
+            });
             break;
         case 'newUid':
             if ($c.guest) return $c.sendError(464);
@@ -1178,7 +1195,74 @@ function processClientRequest($c, msg) {
                 return $c.sendError(465);
             $c.setFlag("uid", nanoid(), true);
             $c.flush(false, false, false, true);
-            $c.send('newUid', { value: $c.getFlag("uid") });
+            $c.send('prompt', {
+                lang: 'uidInfo',
+                type: 'uid',
+                value: $c.getFlag("uid")
+            });
+            break;
+        case 'saveProgress':
+            if (!$c.guest) return $c.sendError(400);
+            let importCode;
+
+            if (msg.gid) {
+                if (!savedProgress["savedUserInfo"].hasOwnProperty(msg.gid)) {
+                    return $c.sendError(400);
+                }
+
+                importCode = msg.gid;
+            } else {
+                const ip = $c.socket.upgradeReq.connection.remoteAddress.slice(7);
+
+                if (savedProgress["reqCountByIp"][ip] > 10) {
+                    return $c.sendError(710);
+                }
+
+                // 절대 그럴 일이 없을 것 같지만.. 메모리에 저장하니까 혹시 모르니 확인해본다.
+                if (savedProgress["savedUserInfo"].length > (2 ** 19)) {
+                    return $c.sendError(434);
+                }
+
+                savedProgress["reqCountByIp"][ip] += 1;
+
+                importCode = importId();
+            }
+
+            savedProgress["savedUserInfo"][importCode] = {
+                "money": $c.money,
+                "score": $c.data.score,
+                "box": $c.box || {}
+            };
+
+            $c.send('prompt', {
+                lang: 'gidInfo',
+                type: 'gid',
+                value: importCode
+            });
+
+            break;
+        case 'import':
+            if ($c.guest) return $c.sendError(711);
+            if (!msg.gid) return $c.sendError(400);
+            if (!savedProgress["savedUserInfo"].hasOwnProperty(msg.gid)) return $c.sendError(712);
+
+            const o = savedProgress["savedUserInfo"][msg.gid];
+
+            $c.money += o.money;
+            $c.data.score += o.score;
+
+            for (let key in o.box) {
+                if ($c.box.hasOwnProperty(key)) {
+                    $c.box[key]["value"] += o.box[key]["value"];
+                } else {
+                    $c.box[key] = o.box[key];
+                }
+            }
+
+            $c.sendError(713);
+            $c.flush(true, false, false, false);
+            delete savedProgress["savedUserInfo"][msg.gid];
+
             break;
         case 'wms':
             processSuspicion.call(this, $c, msg);
@@ -1201,3 +1285,12 @@ KKuTu.onClientClosed(function ($c, code) {
 
     IOLog.notice(`${$c.profile.title}(${$c.id}) 님이 게임에서 퇴장했습니다. 접속 인원: ${Object.keys(DIC).length}명`);
 });
+
+const job = new CronJob('0 0 * * *', () => {
+    savedProgress = {
+        "reqCountByIp": {},
+        "savedUserInfo": {}
+    };
+
+    console.info('자정이 지나 저장된 불러오기 데이터가 초기화되었습니다.');
+}, null, true, "Asia/Seoul");
