@@ -1036,7 +1036,6 @@ function processClientRequest($c, msg) {
 
             if (msg.opts && msg.opts.randmission && !msg.opts.mission) stable = false;
             if (msg.opts && msg.opts.tactical && !msg.opts.mission) stable = false;
-            if (msg.opts && msg.opts.opendict && !msg.opts.injeong) stable = false;
 
             msg.code = false;
             msg.limit = Number(msg.limit);

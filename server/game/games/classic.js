@@ -459,7 +459,10 @@ export function submit (client, text) {
 
         if ($doc) {
             let theme = $doc.theme.split(',');
-            if (!my.opts.injeong && ($doc.flag & KOR_FLAG.INJEONG)) denied();
+            if (
+                !my.opts.injeong && ($doc.flag & KOR_FLAG.INJEONG) &&
+                (!theme || (theme && !theme.includes("ODW")))
+            ) denied();
             else if (!my.opts.opendict && theme && theme.includes("ODW")) denied();
             else if (mode != "KKT" && theme && theme.includes("KKT")) denied();
             else if (mode != "KDA" && mode != "EDA" && theme && theme.includes("DAN")) denied();
