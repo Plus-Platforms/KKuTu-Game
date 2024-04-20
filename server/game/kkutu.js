@@ -428,7 +428,6 @@ export class Client {
                 data = {error: 400};
             }
 
-            if (!data.hasOwnProperty('type') || data.type !== 'polygama') {
             if (!data.hasOwnProperty('type') || data.type !== 'wms') {
                 const roomText = room ? this.place : '로비';
                 IOLog.info(`[` + socket.upgradeReq.connection.remoteAddress.slice(7) + `] ` + `Room @${roomText} Msg #${this.id}: ${msg}`);
