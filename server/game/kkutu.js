@@ -848,7 +848,7 @@ export class Client {
                                     black: black
                                 });
                             } else {
-                                if (Cluster.isMaster && $user.server) {
+                                if (Cluster.isMaster && $user.server && ($user.server != channel)) {
                                     R.go({
                                         result: 409,
                                         black: $user.server
