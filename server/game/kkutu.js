@@ -848,13 +848,12 @@ export class Client {
                                     black: black
                                 });
                             } else {
-                                /* else if (Cluster.isMaster && $user.server) {
-                                        R.go({
-                                            result: 409,
-                                            black: $user.server
-                                        });
-                                    }*/
-                                if (NIGHT && this.isAjae === false) {
+                                if (Cluster.isMaster && $user.server) {
+                                    R.go({
+                                        result: 409,
+                                        black: $user.server
+                                    });
+                                } else if (NIGHT && this.isAjae === false) {
                                     R.go({
                                         result: 440
                                     });
