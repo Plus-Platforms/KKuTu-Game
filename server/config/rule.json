@@ -27,10 +27,7 @@
     "etq": { "name": "Etiquette" },
     "gnt": { "name": "Gentle" },
     "apm": { "name": "Apmal" },
-    "odw": {
-      "name": "OpenDict",
-      "req": "ext"
-    }
+    "odw": { "name": "OpenDict" }
   },
   "RULE": {
     "EKT": {
