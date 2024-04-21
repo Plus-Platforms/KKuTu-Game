@@ -42,7 +42,6 @@ import { DEVELOP, GUEST_PERMISSION, //ENABLE_ROUND_TIME,
     ENABLE_FORM, MODE_LENGTH } from './master.js';
 import * as KKuTu from './kkutu.js';
 import { decrypt } from "../sub/crypto.js";
-// import * as Lizard from '../sub/lizard.js';
 import * as MainDB from '../sub/db.js';
 import * as IOLog from '../sub/KKuTuIOLog.js';
 import { checkMessagneIntegrity } from '../sub/utils/AntiCheat.js';
