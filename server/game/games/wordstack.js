@@ -220,7 +220,7 @@ export function submit (client, text){
                     my.game.mission = getMission(my.rule.lang);
                 }
                 if (pool.length <= 0 && !my.game.timer[client.id]) {
-                    my.game.timer[client.id] = setInterval(runAs 1000, my, applyBonus, client);
+                    my.game.timer[client.id] = setInterval(runAs, 1000, my, applyBonus, client);
                     console.log(`Start bonus for ${client.id}`)
                 } else if (pool.length <= 8 && my.game.timer[client.id]) {
                     clearInterval(my.game.timer[client.id]);
@@ -228,7 +228,7 @@ export function submit (client, text){
                     console.log(`Removed penalty for ${client.id}`)
                 }
                 if (otherpool.length > 8 && !my.game.timer[other]) {
-                    my.game.timer[other] = setInterval(runAs 1000, my, applyBonus, otherClient, true);
+                    my.game.timer[other] = setInterval(runAs, 1000, my, applyBonus, otherClient, true);
                     console.log(`Start penalty for ${other}`)
                 } else if (otherpool.length > 0 && my.game.timer[other]) {
                     clearInterval(my.game.timer[other]);
