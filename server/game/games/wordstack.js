@@ -68,6 +68,7 @@ export function roundReady (){
         my.game.chain = {};
         my.game.pool = {};
         my.game.dic = {};
+        my.game.timers = {};
 
         if (my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.tactical);
         for (let k in my.game.seq) {
@@ -78,6 +79,7 @@ export function roundReady (){
             for(let i = 0; i < 5; i++) {
                 my.game.pool[t].push(getRandom(my.game.charpool))
             }
+            my.game.timers[k] = 0;
         }
         let subPool = {};
         for (let i in my.game.pool) {
@@ -122,6 +124,22 @@ export function turnEnd (){
     }, true);
     my.game._rrt = setTimeout(runAs, (my.game.round == my.round) ? 3000 : 10000, my, my.roundReady);
     clearTimeout(my.game.robotTimer);
+    for (let k in my.game.seq) {
+        if (my.game.timers[k]) clearInterval(my.game.timers[k])
+        my.game.timers[k] = 0;
+    }
+}
+
+function applyBonus(client, isPenalty){
+    if (c.id)
+    score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
+    client.game.score += score;
+    client.publish('turnEnd', {
+        ok: true,
+        target: client.id,
+        score: score,
+        isBonus: true
+    });
 }
 
 export function submit (client, text){
@@ -161,12 +179,12 @@ export function submit (client, text){
                 for (let c of seq) { // 사실 반드시 돌아가야한다
                     if (c.robot) {
                         if (c.id == client.id) continue;
-                        others.push(c.id);
+                        others.push([c.id, c]);
                         continue;
                     } else if (c == client.id) continue;
-                    others.push(c);
+                    others.push([c, DIC[c]]);
                 }
-                let other = getRandom(others);
+                let [other, otherClient] = getRandom(others);
                 let otherpool = my.game.pool[other]
                 otherpool.push(preChar);
                 my.game.roundTime -= t;
@@ -194,6 +212,18 @@ export function submit (client, text){
                 });
                 if(my.game.mission === client.id) {
                     my.game.mission = getMission(my.rule.lang);
+                }
+                if (pool.length <= 0 && !my.game.timer[client.id]) {
+                    my.game.timer[client.id] = setInterval(applyBonus, 1000, client);
+                } else if (pool.length <= 8 && my.game.timer[client.id]) {
+                    clearInterval(my.game.timer[client.id]);
+                    my.game.timer[client.id] = 0;
+                }
+                if (otherpool.length > 8 && !my.game.timer[other]) {
+                    my.game.timer[other] = setInterval(applyBonus, 1000, otherClient, true);
+                } else if (otherpool.length > 0 && my.game.timer[other]) {
+                    clearInterval(my.game.timer[other]);
+                    my.game.timer[other] = 0;
                 }
                 // setTimeout(runAs, my.game.turnTime / 6, my, my.turnNext);
                 if(!client.robot){
