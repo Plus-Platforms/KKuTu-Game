@@ -1404,7 +1404,7 @@ export class Client {
             console.log("Cleared Bonus")
         }
         if (this.pracRoom && this.pracRoom.game.timer) {
-            clearInterval($room.game.timer[this.id]);
+            clearInterval(this.pracRoom.game.timer[this.id]);
             console.log("Cleared Bonus from PracRoom")
         }
 
