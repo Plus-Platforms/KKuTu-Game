@@ -79,6 +79,7 @@ export function roundReady (){
             for(let i = 0; i < 5; i++) {
                 my.game.pool[t].push(getRandom(my.game.charpool))
             }
+            if (my.game.timer[k]) clearInterval(my.game.timer[k]);
             my.game.timer[k] = 0;
         }
         let subPool = {};
@@ -131,6 +132,11 @@ export function turnEnd (){
 }
 
 function applyBonus(client, isPenalty){
+    let my = this;
+    if (my.game.late) {
+        if (my.game.timer[k]) clearInterval(my.game.timer[k]);
+        my.game.timer[k] = 0;
+    }
     let score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
     client.game.score += score;
     client.publish('turnEnd', {
@@ -214,7 +220,7 @@ export function submit (client, text){
                     my.game.mission = getMission(my.rule.lang);
                 }
                 if (pool.length <= 0 && !my.game.timer[client.id]) {
-                    my.game.timer[client.id] = setInterval(applyBonus, 1000, client);
+                    my.game.timer[client.id] = setInterval(runAs 1000, my, applyBonus, client);
                     console.log(`Start bonus for ${client.id}`)
                 } else if (pool.length <= 8 && my.game.timer[client.id]) {
                     clearInterval(my.game.timer[client.id]);
@@ -222,7 +228,7 @@ export function submit (client, text){
                     console.log(`Removed penalty for ${client.id}`)
                 }
                 if (otherpool.length > 8 && !my.game.timer[other]) {
-                    my.game.timer[other] = setInterval(applyBonus, 1000, otherClient, true);
+                    my.game.timer[other] = setInterval(runAs 1000, my, applyBonus, otherClient, true);
                     console.log(`Start penalty for ${other}`)
                 } else if (otherpool.length > 0 && my.game.timer[other]) {
                     clearInterval(my.game.timer[other]);
