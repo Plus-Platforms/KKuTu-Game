@@ -720,7 +720,7 @@ export async function init (_SID, _CHAN) {
                                 code: 409, message: $c.server
                             });
 
-                            $c._error = ref.result;
+                            $c._error = 409;
                             $c.socket.close();
                             return;
                         }
