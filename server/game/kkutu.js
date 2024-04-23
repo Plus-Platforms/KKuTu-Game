@@ -1401,6 +1401,11 @@ export class Client {
         let $room = ROOM[this.place];
         if ($room && $room.game.timer) {
             clearInterval($room.game.timer[this.id]);
+            console.log("Cleared Bonus")
+        }
+        if (pracRoom && pracRoom.game.timer) {
+            clearInterval($room.game.timer[this.id]);
+            console.log("Cleared Bonus from PracRoom")
         }
 
         if (this.subPlace) {
