@@ -140,7 +140,7 @@ function applyBonus(client, isPenalty){
         delete my.game.timer[client.id];
     }
     let preScore = client.game.score;
-    let score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
+    let score = (isPenalty ? -10 : 10) + Math.floor(Math.random()*6);
     client.game.score += score;
     if (client.game.score < 0) {
         score = -preScore;
@@ -216,10 +216,10 @@ export function submit (client, text){
                     score: score,
                     bonus: (my.game.mission === client.id) ? score - my.getScore.call(my, text, t, client.id, true) : 0,
                     baby: $doc.baby,
-                    pool: pool,
+                    pool: pool, // 공격자가 가지고 있는 글자
                     subpool: getSubpool.call(my, pool),
                     attack: other,
-                    otherpool: otherpool,
+                    otherpool: otherpool, // 방어자가 가지고 있는 글자
                     othersub: getSubpool.call(my, otherpool)
                 });
                 if(my.game.mission === client.id) {
@@ -240,8 +240,8 @@ export function submit (client, text){
                 } else if (otherpool.length > 0 && my.game.timer[other] && !my.game.penalty[other]) {
                     clearInterval(my.game.timer[other]);
                     my.game.timer[other] = 0;
-
                 }
+
                 // setTimeout(runAs, my.game.turnTime / 6, my, my.turnNext);
                 if(!client.robot){
                     client.invokeWordPiece(text, 1);
