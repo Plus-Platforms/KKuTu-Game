@@ -68,7 +68,7 @@ export function roundReady (){
         my.game.chain = {};
         my.game.pool = {};
         my.game.dic = {};
-        my.game.timers = {};
+        my.game.timer = {};
 
         if (my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.tactical);
         for (let k in my.game.seq) {
@@ -79,7 +79,7 @@ export function roundReady (){
             for(let i = 0; i < 5; i++) {
                 my.game.pool[t].push(getRandom(my.game.charpool))
             }
-            my.game.timers[k] = 0;
+            my.game.timer[k] = 0;
         }
         let subPool = {};
         for (let i in my.game.pool) {
@@ -125,8 +125,8 @@ export function turnEnd (){
     my.game._rrt = setTimeout(runAs, (my.game.round == my.round) ? 3000 : 10000, my, my.roundReady);
     clearTimeout(my.game.robotTimer);
     for (let k in my.game.seq) {
-        if (my.game.timers[k]) clearInterval(my.game.timers[k])
-        my.game.timers[k] = 0;
+        if (my.game.timer[k]) clearInterval(my.game.timer[k])
+        my.game.timer[k] = 0;
     }
 }
 
@@ -140,6 +140,7 @@ function applyBonus(client, isPenalty){
         score: score,
         isBonus: true
     });
+    console.log(`Bonus applied to ${client.id}`)
 }
 
 export function submit (client, text){
