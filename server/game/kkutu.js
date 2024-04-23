@@ -533,15 +533,15 @@ export class Client {
         }
 
         // 채팅 도배 차단
-        if (type == 'chat' && !this.subPlace && (!$room || !$room.gaming || $room.game.seq.indexOf(this.id) == -1)) {
-            let stChat = now - this._pubChat;
-            if (stChat <= CHAT_SPAM_ADD_DELAY) this.spamChat++;
-            else if (stChat >= CHAT_SPAM_CLEAR_DELAY) this.spamChat = 0;
-            if (this.spamChat >= CHAT_SPAM_LIMIT) {
-                if (!this.blockedChat) this.numSpamChat = 0;
-                this.blockedChat = true;
-            }
-            if (!noBlock) {
+        if (!noBlock) {
+            if (type == 'chat' && !this.subPlace && (!$room || !$room.gaming || $room.game.seq.indexOf(this.id) == -1)) {
+                let stChat = now - this._pubChat;
+                if (stChat <= CHAT_SPAM_ADD_DELAY) this.spamChat++;
+                else if (stChat >= CHAT_SPAM_CLEAR_DELAY) this.spamChat = 0;
+                if (this.spamChat >= CHAT_SPAM_LIMIT) {
+                    if (!this.blockedChat) this.numSpamChat = 0;
+                    this.blockedChat = true;
+                }
                 this._pubChat = now;
                 if (this.blockedChat) {
                     if (stChat < CHAT_BLOCKED_LENGTH) {
@@ -552,17 +552,15 @@ export class Client {
                         return this.send('blocked');
                     } else this.blockedChat = false;
                 }
-            }
-            // 패킷 도배 차단
-        } else {
-            let st = now - this._pub;
-            if (st <= SPAM_ADD_DELAY) this.spam++;
-            else if (st >= SPAM_CLEAR_DELAY) this.spam = 0;
-            if (this.spam >= SPAM_LIMIT) {
-                if (!this.blocked) this.numSpam = 0;
-                this.blocked = true;
-            }
-            if (!noBlock) {
+                // 패킷 도배 차단
+            } else {
+                let st = now - this._pub;
+                if (st <= SPAM_ADD_DELAY) this.spam++;
+                else if (st >= SPAM_CLEAR_DELAY) this.spam = 0;
+                if (this.spam >= SPAM_LIMIT) {
+                    if (!this.blocked) this.numSpam = 0;
+                    this.blocked = true;
+                }
                 this._pub = now;
                 if (this.blocked) {
                     if (st < BLOCKED_LENGTH) {

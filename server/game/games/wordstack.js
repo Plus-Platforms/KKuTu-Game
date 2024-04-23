@@ -151,7 +151,7 @@ function applyBonus(client, isPenalty){
         target: client.id,
         score: score,
         isBonus: true
-    });
+    }, true);
 }
 
 export function submit (client, text){
