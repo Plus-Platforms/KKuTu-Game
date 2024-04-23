@@ -715,6 +715,15 @@ export async function init (_SID, _CHAN) {
                 }
                 $c.refresh().then(function (ref) {
                     if (ref.result == 200) {
+                        if ($c.server && $c.server != SID) { // 이미 다른 서버에 접속중
+                            $c.send('error', {
+                                code: 409, message: $c.server
+                            });
+
+                            $c._error = ref.result;
+                            $c.socket.close();
+                            return;
+                        }
                         DIC[$c.id] = $c;
                         DNAME[($c.profile.title || $c.profile.name).replace(/\s/g, "")] = $c.id;
                         MainDB.users.update(['_id', $c.id]).set(['lastLogin', Date.now()], ['server', SID]).on();

@@ -761,6 +761,7 @@ export class Client {
                             this.flags = $user.flags || {};
                             this.membership = obtainMembershipId($user.membership);
                             this.perks = obtainMembershipPerks(this.membership);
+                            this.server = $user.server || "";
 
                             let isFlush = {
                                 "item": false,
@@ -848,12 +849,7 @@ export class Client {
                                     black: black
                                 });
                             } else {
-                                if (Cluster.isMaster && $user.server/* && ($user.server != channel) */) {
-                                    R.go({
-                                        result: 409,
-                                        black: $user.server
-                                    });
-                                } else if (NIGHT && this.isAjae === false) {
+                                if (NIGHT && this.isAjae === false) {
                                     R.go({
                                         result: 440
                                     });
