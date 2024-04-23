@@ -1399,6 +1399,9 @@ export class Client {
     
     leave (kickVote) {
         let $room = ROOM[this.place];
+        if ($room && $room.game.timer) {
+            clearInterval($room.game.timer[this.id]);
+        }
 
         if (this.subPlace) {
             this.pracRoom.go(this);
