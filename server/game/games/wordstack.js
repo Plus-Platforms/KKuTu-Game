@@ -131,7 +131,7 @@ export function turnEnd (){
 }
 
 function applyBonus(client, isPenalty){
-    score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
+    let score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
     client.game.score += score;
     client.publish('turnEnd', {
         ok: true,
