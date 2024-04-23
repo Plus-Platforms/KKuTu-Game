@@ -131,7 +131,6 @@ export function turnEnd (){
 }
 
 function applyBonus(client, isPenalty){
-    if (c.id)
     score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
     client.game.score += score;
     client.publish('turnEnd', {
@@ -216,15 +215,20 @@ export function submit (client, text){
                 }
                 if (pool.length <= 0 && !my.game.timer[client.id]) {
                     my.game.timer[client.id] = setInterval(applyBonus, 1000, client);
+                    console.log(`Start bonus for ${client.id}`)
                 } else if (pool.length <= 8 && my.game.timer[client.id]) {
                     clearInterval(my.game.timer[client.id]);
                     my.game.timer[client.id] = 0;
+                    console.log(`Removed penalty for ${client.id}`)
                 }
                 if (otherpool.length > 8 && !my.game.timer[other]) {
                     my.game.timer[other] = setInterval(applyBonus, 1000, otherClient, true);
+                    console.log(`Start penalty for ${other}`)
                 } else if (otherpool.length > 0 && my.game.timer[other]) {
                     clearInterval(my.game.timer[other]);
                     my.game.timer[other] = 0;
+                    console.log(`Removed bonus for ${other}`)
+
                 }
                 // setTimeout(runAs, my.game.turnTime / 6, my, my.turnNext);
                 if(!client.robot){
