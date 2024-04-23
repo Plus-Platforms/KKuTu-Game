@@ -1407,13 +1407,11 @@ export class Client {
                     clearInterval($room.game.timer[k]);
                 }
             }
-            console.log("Cleared Bonus")
         }
         if (this.pracRoom && this.pracRoom.game.timer) {
             for (let k in this.pracRoom.game.timer) {
                 clearInterval(this.pracRoom.game.timer[k]);
             }
-            console.log("Cleared Bonus from PracRoom")
         }
 
         if (this.subPlace) {

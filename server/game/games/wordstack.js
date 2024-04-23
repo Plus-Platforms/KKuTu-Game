@@ -139,15 +139,19 @@ function applyBonus(client, isPenalty){
         if (my.game.timer[k]) clearInterval(my.game.timer[k]);
         my.game.timer[k] = 0;
     }
+    let preScore = client.game.score;
     let score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
     client.game.score += score;
+    if (client.game.score < 0) {
+        score = -preScore;
+        client.game.score = 0;
+    }
     client.publish('turnEnd', {
-        ok: true,
+        ok: !isPenalty,
         target: client.id,
         score: score,
         isBonus: true
     });
-    console.log(`Bonus applied to ${client.id}`)
 }
 
 export function submit (client, text){
@@ -221,23 +225,21 @@ export function submit (client, text){
                 if(my.game.mission === client.id) {
                     my.game.mission = getMission(my.rule.lang);
                 }
+
                 if (pool.length <= 0 && !my.game.timer[client.id]) {
                     my.game.timer[client.id] = setInterval(runAs, 1000, my, applyBonus, client);
                     my.game.penalty[client.id] = false;
-                    console.log(`Start bonus for ${client.id}`)
                 } else if (pool.length <= 8 && my.game.timer[client.id] && my.game.penalty[client.id]) {
                     clearInterval(my.game.timer[client.id]);
                     my.game.timer[client.id] = 0;
-                    console.log(`Removed penalty for ${client.id}`)
                 }
+
                 if (otherpool.length > 8 && !my.game.timer[other]) {
                     my.game.timer[other] = setInterval(runAs, 1000, my, applyBonus, otherClient, true);
                     my.game.penalty[client.id] = true;
-                    console.log(`Start penalty for ${other}`)
                 } else if (otherpool.length > 0 && my.game.timer[other] && !my.game.penalty[other]) {
                     clearInterval(my.game.timer[other]);
                     my.game.timer[other] = 0;
-                    console.log(`Removed bonus for ${other}`)
 
                 }
                 // setTimeout(runAs, my.game.turnTime / 6, my, my.turnNext);
