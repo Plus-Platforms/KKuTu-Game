@@ -137,7 +137,7 @@ function applyBonus(client, isPenalty){
     let my = this;
     if (my.game.late) {
         if (my.game.timer[client.id]) clearInterval(my.game.timer[client.id]);
-        delete my.game.timer[client.id];
+        my.game.timer[client.id] = 0;
     }
     let preScore = client.game.score;
     let score = (isPenalty ? -10 : 10) + Math.floor(Math.random()*6);
@@ -236,7 +236,7 @@ export function submit (client, text){
 
                 if (otherpool.length > 8 && !my.game.timer[other]) {
                     my.game.timer[other] = setInterval(runAs, 1000, my, applyBonus, otherClient, true);
-                    my.game.penalty[client.id] = true;
+                    my.game.penalty[other] = true;
                 } else if (otherpool.length > 0 && my.game.timer[other] && !my.game.penalty[other]) {
                     clearInterval(my.game.timer[other]);
                     my.game.timer[other] = 0;
