@@ -136,8 +136,8 @@ export function turnEnd (){
 function applyBonus(client, isPenalty){
     let my = this;
     if (my.game.late) {
-        if (my.game.timer[k]) clearInterval(my.game.timer[k]);
-        my.game.timer[k] = 0;
+        if (my.game.timer[client.id]) clearInterval(my.game.timer[client.id]);
+        delete my.game.timer[client.id];
     }
     let preScore = client.game.score;
     let score = (isPenalty ? -10 : 15) + Math.floor(Math.random()*6);
