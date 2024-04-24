@@ -146,7 +146,7 @@ function applyBonus(client, isPenalty){
         if(my.game.bonus[client.id] < 10) {
             score *= (1 - (my.game.bonus[client.id] * 0.1));
             my.game.bonus[client.id]++;
-        } else score = 0
+        } else score = 0;
     }
     client.game.score += score;
     if (client.game.score < 0) {
