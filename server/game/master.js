@@ -512,7 +512,10 @@ Cluster.on('message', function (worker, msg) {
                 break;
             }
             DIC[msg.target]._invited = msg.place;
-            DIC[msg.target].send('invited', {from: msg.place});
+            DIC[msg.target].send('invited', {
+                from: msg.place,
+                by: msg.id
+            });
             break;
         case "room-new":
             if (ROOM[msg.room.id] || !DIC[msg.target]) { // 이미 그런 ID의 방이 있다... 그 방은 없던 걸로 해라.
