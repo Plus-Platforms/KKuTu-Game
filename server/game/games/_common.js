@@ -46,7 +46,7 @@ export const KOR_FLAG = {
 export const ROBOT_START_DELAY = [ 1200, 800, 500, 300, 150, 10 ];
 export const ROBOT_TYPE_COEF = [ 1000, 600, 300, 200, 100, 5 ]; // 자음퀴즈는 두배로 사용
 export const ROBOT_THINK_COEF = [ 4, 3, 2, 1, 0, 0 ];
-export const ROBOT_HIT_LIMIT = [ 4, 3, 2, 1, 0, 0 ]; // 단어대결은 절반으로 사용
+export const ROBOT_HIT_LIMIT = [ 2, 1, 1, 0, 0, 0 ]; // 단어대결은 절반으로 사용
 export const ROBOT_LENGTH_LIMIT = [ 3, 6, 9, 27, 54, 99 ];
 
 // 십자말풀이, 해당 부분이 더미데이터라 제외함
