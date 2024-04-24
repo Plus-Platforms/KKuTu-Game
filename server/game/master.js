@@ -1004,7 +1004,16 @@ function processClientRequest($c, msg) {
         case 'friendEdit':
             if (!$c.friends) return;
             if (!$c.friends[msg.id]) return;
-            $c.friends[msg.id] = (msg.memo || "").slice(0, 50);
+            if (typeof $c.friends[msg.id] !== 'object') {
+                // 기존 친구에 대한 처리
+                const newData = {
+                    "nick": $c.friends[msg.id],
+                    "memo": $c.friends[msg.id],
+                    "bf": false
+                };
+                $c.friends[msg.id] = newData;
+            }
+            $c.friends[msg.id]["memo"] = (msg.memo || "");
             $c.flush(false, false, true);
             $c.send('friendEdit', {friends: $c.friends});
             break;
@@ -1012,6 +1021,22 @@ function processClientRequest($c, msg) {
             if (!$c.friends) return;
             if (!$c.friends[msg.id]) return;
             $c.removeFriend(msg.id);
+            break;
+        case 'toggleBF':
+            if (!$c.friends) return;
+            if (!$c.friends[msg.id]) return;
+            if (typeof $c.friends[msg.id] !== 'object') {
+                // 기존 친구에 대한 처리
+                const newData = {
+                    "nick": $c.friends[msg.id],
+                    "memo": $c.friends[msg.id],
+                    "bf": false
+                };
+                $c.friends[msg.id] = newData;
+            }
+            $c.friends[msg.id]["bf"] = !$c.friends[msg.id]["bf"];
+            $c.flush(false, false, true);
+            $c.send('friendEdit', {friends: $c.friends});
             break;
         case 'report':
             // IOLog.info("[DEBUG] Got Response: REPORT");

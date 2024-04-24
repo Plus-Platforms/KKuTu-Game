@@ -1635,7 +1635,11 @@ export class Client {
         let fd = DIC[id];
 
         if (!fd) return;
-        this.friends[id] = fd.profile.title || fd.profile.name;
+        this.friends[id] = {
+            "nick": fd.profile.title || fd.profile.name,
+            "memo": fd.profile.title || fd.profile.name,
+            "bf": false
+        };
         this.flush(false, false, true);
         this.send('friendEdit', {friends: this.friends});
     };
