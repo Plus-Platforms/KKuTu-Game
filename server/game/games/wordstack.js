@@ -83,6 +83,7 @@ export function roundReady (){
             if (my.game.timer[k]) clearInterval(my.game.timer[k]);
             my.game.timer[k] = 0;
             my.game.penalty[k] = false;
+            my.game.bonus[k] = 0;
         }
         let subPool = {};
         for (let i in my.game.pool) {
@@ -141,6 +142,12 @@ function applyBonus(client, isPenalty){
     }
     let preScore = client.game.score;
     let score = (isPenalty ? -10 : 10) + Math.floor(Math.random()*6);
+    if (!isPenalty) {
+        if(my.game.bonus[client.id] < 10) {
+            score *= (1 - (my.game.bonus[client.id] * 0.1));
+            my.game.bonus[client.id]++;
+        } else score = 0
+    }
     client.game.score += score;
     if (client.game.score < 0) {
         score = -preScore;
