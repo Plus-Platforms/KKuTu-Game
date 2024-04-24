@@ -144,6 +144,7 @@ function applyBonus(client, isPenalty){
     let preScore = client.game.score;
     let score = (isPenalty ? -10 : 10) + Math.floor(Math.random()*6);
     if (!isPenalty) {
+        console.log(my.game.bonus[client.id]);
         if(my.game.bonus[client.id] < 10) {
             score *= (1 - (my.game.bonus[client.id] * 0.1));
             my.game.bonus[client.id]++;
