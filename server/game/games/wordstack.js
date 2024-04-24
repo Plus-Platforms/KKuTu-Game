@@ -70,6 +70,7 @@ export function roundReady (){
         my.game.dic = {};
         my.game.timer = {};
         my.game.penalty = {};
+        my.game.bonus = {};
 
         if (my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.tactical);
         for (let k in my.game.seq) {
@@ -153,7 +154,7 @@ function applyBonus(client, isPenalty){
         score = -preScore;
         client.game.score = 0;
     }
-    client.publish('turnEnd', {
+    if (score !== 0) client.publish('turnEnd', {
         ok: !isPenalty,
         target: client.id,
         score: score,
