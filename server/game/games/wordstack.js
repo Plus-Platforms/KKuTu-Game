@@ -75,16 +75,16 @@ export function roundReady (){
         if (my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.tactical);
         for (let k in my.game.seq) {
             let o = my.game.seq[k]
-            let t = o.robot ? o.id : o
+            let t = o.robot ? o.id : o;
             my.game.chain[t] = [];
             my.game.pool[t] = [];
             for(let i = 0; i < 5; i++) {
                 my.game.pool[t].push(getRandom(my.game.charpool))
             }
-            if (my.game.timer[k]) clearInterval(my.game.timer[k]);
-            my.game.timer[k] = 0;
-            my.game.penalty[k] = false;
-            my.game.bonus[k] = 0;
+            if (my.game.timer[t]) clearInterval(my.game.timer[t]);
+            my.game.timer[t] = 0;
+            my.game.penalty[t] = false;
+            my.game.bonus[t] = 0;
         }
         let subPool = {};
         for (let i in my.game.pool) {
@@ -130,24 +130,29 @@ export function turnEnd (){
     my.game._rrt = setTimeout(runAs, (my.game.round == my.round) ? 3000 : 10000, my, my.roundReady);
     clearTimeout(my.game.robotTimer);
     for (let k in my.game.seq) {
-        if (my.game.timer[k]) clearInterval(my.game.timer[k])
-        my.game.timer[k] = 0;
+        let o = my.game.seq[k]
+        let t = o.robot ? o.id : o;
+
+        if (my.game.timer[t]) clearInterval(my.game.timer[t])
+        my.game.timer[t] = 0;
     }
 }
 
 function applyBonus(client, isPenalty){
     let my = this;
+    let clientId = client.robot ? client.id : client;
+
     if (my.game.late) {
-        if (my.game.timer[client.id]) clearInterval(my.game.timer[client.id]);
-        my.game.timer[client.id] = 0;
+        if (my.game.timer[clientId]) clearInterval(my.game.timer[clientId]);
+        my.game.timer[clientId] = 0;
     }
     let preScore = client.game.score;
     let score = (isPenalty ? -10 : 10) + Math.floor(Math.random()*6);
-    if (!isPenalty) {
-        console.log(my.game.bonus[client.id]);
-        if(my.game.bonus[client.id] < 10) {
-            score *= (1 - (my.game.bonus[client.id] * 0.1));
-            my.game.bonus[client.id]++;
+    if (!isPenalty && my.game.bonus) {
+        if(!my.game.bonus[clientId]) my.game.bonus[clientId] = 0;
+        if(my.game.bonus[clientId] < 10) {
+            score = Math.round(score * (1 - (my.game.bonus[clientId] * 0.1)));
+            my.game.bonus[clientId]++;
         } else score = 0;
     }
     client.game.score += score;
