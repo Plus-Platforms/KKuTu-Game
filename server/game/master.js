@@ -1220,7 +1220,7 @@ function processClientRequest($c, msg) {
         case 'uid':
             if ($c.guest) return $c.sendError(464);
             $c.send('prompt', {
-                lang: 'newUidInfo',
+                lang: 'uidInfo',
                 type: 'uid',
                 value: $c.getFlag("uid")
             });
@@ -1232,7 +1232,7 @@ function processClientRequest($c, msg) {
             $c.setFlag("uid", nanoid(), true);
             $c.flush(false, false, false, true);
             $c.send('prompt', {
-                lang: 'uidInfo',
+                lang: 'newUidInfo',
                 type: 'uid',
                 value: $c.getFlag("uid")
             });
