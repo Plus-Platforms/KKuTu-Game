@@ -1007,6 +1007,7 @@ function processClientRequest($c, msg) {
         case 'friendEdit':
             if (!$c.friends) return;
             if (!$c.friends[msg.id]) return;
+            if (msg.memo && msg.memo > 50) return;
             if (typeof $c.friends[msg.id] !== 'object') {
                 // 기존 친구에 대한 처리
                 const newData = {
