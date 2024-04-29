@@ -1066,7 +1066,7 @@ export class Client {
                             else if (curr.type == "exp") base = this.data.score;
                             else if (curr.type == "ep") base = this.event.point;
                             else continue; // 여기로 오면 안된다.
-                            addResult(curr.type, Math.round(Math.sqrt(4 + 3.6 * base) / 2));
+                            addResult(curr.type, Math.round(Math.sqrt(4 + 3.0 * base) / 2));
                         }
                     }
                 }
